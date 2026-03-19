@@ -1,0 +1,11 @@
+{
+  "datasets": [
+    {
+      "name": "hr_handbook",
+      "display_name": "HR Handbook",
+      "aliases": ["hr", "handbook", "인사규정"],
+      "status": "ready"
+    }
+  ],
+  "total": 1
+}

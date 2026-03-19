@@ -1,0 +1,5 @@
+{
+  "question": "연차는 언제 소멸돼?",
+  "dataset_name": "hr_handbook",
+  "top_k": 4
+}

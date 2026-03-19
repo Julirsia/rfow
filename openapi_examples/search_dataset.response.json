@@ -1,0 +1,26 @@
+{
+  "query": "연차는 언제 소멸돼?",
+  "selected_dataset": "hr_handbook",
+  "found": true,
+  "result_count": 2,
+  "context_text": "[1] leave_policy.pdf\n연차는 발생일 기준 1년 내 사용해야 하며...",
+  "chunks": [
+    {
+      "rank": 1,
+      "dataset_name": "hr_handbook",
+      "document_name": "leave_policy.pdf",
+      "snippet": "연차는 발생일 기준 1년 내 사용해야 하며...",
+      "score": 0.932,
+      "source_label": "hr_handbook / leave_policy.pdf",
+      "source_download_url": "https://wrapper.example.com/_downloads/token"
+    }
+  ],
+  "sources": [
+    {
+      "dataset_name": "hr_handbook",
+      "document_name": "leave_policy.pdf",
+      "source_label": "hr_handbook / leave_policy.pdf",
+      "source_download_url": "https://wrapper.example.com/_downloads/token"
+    }
+  ]
+}

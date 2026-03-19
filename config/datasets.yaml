@@ -1,0 +1,10 @@
+datasets:
+  - name: hr_handbook
+    display_name: HR Handbook
+    ragflow_name: HR Handbook
+    aliases:
+      - hr
+      - handbook
+      - employee handbook
+      - 인사규정
+    enabled: true
