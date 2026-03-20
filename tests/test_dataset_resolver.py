@@ -12,6 +12,9 @@ def test_list_datasets_marks_ready_status(client) -> None:
     body = response.json()
     assert body["total"] == 2
     assert body["datasets"][0]["status"] == "ready"
+    assert body["datasets"][0]["vendor"] == "apple"
+    assert body["datasets"][0]["doc_type"] == "feature"
+    assert "기능 설명" in body["datasets"][0]["description"]
 
 
 def test_documents_support_alias_resolution(client) -> None:

@@ -17,6 +17,9 @@ class DatasetCatalogEntry(BaseModel):
     name: str
     display_name: str
     ragflow_name: Optional[str] = None
+    vendor: Optional[str] = None
+    doc_type: Optional[str] = None
+    description: Optional[str] = None
     aliases: list[str] = Field(default_factory=list)
     enabled: bool = True
     model_config = ConfigDict(str_strip_whitespace=True)

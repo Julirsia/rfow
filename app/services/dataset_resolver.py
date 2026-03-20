@@ -39,6 +39,9 @@ class DatasetResolver:
                 DatasetItem(
                     name=entry.name,
                     display_name=entry.display_name,
+                    vendor=entry.vendor,
+                    doc_type=entry.doc_type,
+                    description=entry.description,
                     aliases=entry.aliases,
                     status="ready" if matched else "missing",
                 )

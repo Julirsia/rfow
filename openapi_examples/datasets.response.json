@@ -3,6 +3,9 @@
     {
       "name": "hr_handbook",
       "display_name": "HR Handbook",
+      "vendor": "apple",
+      "doc_type": "feature",
+      "description": "Apple 장비의 기능 설명, 사용법, 지원 기능, 운영 가이드 문서",
       "aliases": ["hr", "handbook", "인사규정"],
       "status": "ready"
     }

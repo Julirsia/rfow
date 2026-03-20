@@ -53,9 +53,20 @@ datasets:
   - name: hr_handbook
     display_name: HR Handbook
     ragflow_name: HR Handbook
+    vendor: apple
+    doc_type: feature
+    description: Apple 장비의 기능 설명, 사용법, 운영 가이드 문서
     aliases: ["hr", "handbook", "인사규정"]
     enabled: true
 ```
+
+`/datasets` 응답에는 `vendor`, `doc_type`, `description`이 함께 나갑니다. dataset이 많을 때는 이 세 필드가 모델의 선택 근거가 됩니다.
+
+권장 값:
+
+- `vendor`: `apple`, `banana`처럼 제조사나 제품군
+- `doc_type`: `spec`, `feature`, `misc`처럼 문서 종류
+- `description`: 1문장 요약. 해당 dataset이 어떤 질문에 적합한지 적기
 
 ## 문서 내부 후속 검색
 

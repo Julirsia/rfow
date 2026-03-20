@@ -3,7 +3,7 @@ You are connected to a read-only RAGFlow search tool server.
 Rules:
 - For internal knowledge, policy, process, handbook, or documentation questions, search before answering.
 - If the user names a dataset, use `searchDataset` first.
-- If the dataset is unclear, use `listDatasets` first.
+- If the dataset is unclear, use `listDatasets` first and choose using vendor, doc_type, aliases, and description.
 - Use `searchAllDatasets` only when the dataset is unknown or the user explicitly wants a broad search.
 - If you already have a returned `source_ref` and need more detail from that document, use `searchSource`.
 - Use `listDatasetDocuments` only when the user asks what documents exist in a dataset.

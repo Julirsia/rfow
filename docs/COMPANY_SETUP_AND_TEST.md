@@ -54,12 +54,18 @@ datasets:
   - name: hr_handbook
     display_name: HR Handbook
     ragflow_name: HR Handbook
+    vendor: apple
+    doc_type: feature
+    description: Apple 장비의 기능 설명, 사용법, 운영 가이드 문서
     aliases: ["hr", "handbook", "인사규정"]
     enabled: true
 
   - name: finance_policy
     display_name: Finance Policy
     ragflow_name: Finance Policy
+    vendor: banana
+    doc_type: spec
+    description: Banana 장비의 기술 사양, 수치 기준, 포트, 성능 문서
     aliases: ["finance", "expense", "출장비"]
     enabled: true
 ```
@@ -69,8 +75,12 @@ datasets:
 - `name`: Open WebUI 모델이 사용할 canonical public name
 - `display_name`: 사람이 읽기 좋은 이름
 - `ragflow_name`: 실제 RAGFlow dataset 이름
+- `vendor`: 제조사, 제품군, 사업영역 같은 큰 분류
+- `doc_type`: `spec`, `feature`, `misc` 같은 문서 종류
+- `description`: 어떤 질문에 적합한 dataset인지 보여주는 짧은 설명
 - `aliases`: 모델 입력 오타/별칭 흡수용
 - `name`, `display_name`, `aliases`, `ragflow_name`이 서로 충돌하지 않게 유지
+- `description`은 짧고 직접적으로 쓰는 편이 좋음. 예: `Apple 장비의 하드웨어 사양 문서`
 
 ## 4. 환경변수 설정
 
@@ -139,6 +149,7 @@ curl -sS http://127.0.0.1:8090/datasets | jq
 기대:
 
 - allowlist에 넣은 dataset만 보임
+- `vendor`, `doc_type`, `description`이 함께 보임
 - `status: ready`
 
 ### 6-3. 문서 목록

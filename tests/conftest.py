@@ -20,6 +20,9 @@ DATASET_CONFIG_PATH.write_text(
   - name: hr_handbook
     display_name: HR Handbook
     ragflow_name: HR Handbook
+    vendor: apple
+    doc_type: feature
+    description: Apple 장비의 기능 설명, 사용법, 휴가/근태와 같은 인사성 정책 안내 문서
     aliases:
       - hr
       - handbook
@@ -28,6 +31,9 @@ DATASET_CONFIG_PATH.write_text(
   - name: finance_policy
     display_name: Finance Policy
     ragflow_name: Finance Policy
+    vendor: banana
+    doc_type: spec
+    description: Banana 장비나 비용 처리의 수치 기준, 제출 요건, 정산 규칙 문서
     aliases:
       - finance
       - expense

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import Field, field_validator
 
@@ -10,6 +10,9 @@ from app.models.common import FlatResponseModel
 class DatasetItem(FlatResponseModel):
     name: str
     display_name: str
+    vendor: Optional[str] = None
+    doc_type: Optional[str] = None
+    description: Optional[str] = None
     aliases: list[str] = Field(default_factory=list)
     status: Literal["ready", "missing"]
 
