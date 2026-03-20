@@ -93,6 +93,7 @@ SNIPPET_MAX_CHARS=320
 CONTEXT_MAX_CHARS=1500
 DOWNLOAD_TOKEN_TTL_SECONDS=900
 DOWNLOAD_TOKEN_SECRET=replace-with-random-secret
+SOURCE_REF_TTL_SECONDS=86400
 CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 LOG_LEVEL=INFO
 ```
@@ -149,6 +150,7 @@ curl -sS http://127.0.0.1:8090/datasets/hr_handbook/documents | jq
 기대:
 
 - `document_name`
+- `source_ref`
 - `source_download_url`
 
 ### 6-4. 단일 dataset 검색
@@ -166,8 +168,29 @@ curl -sS -X POST http://127.0.0.1:8090/search_dataset \
 기대:
 
 - `found: true`
-- `chunks`에 `dataset_name`, `document_name`, `snippet`, `score`, `source_download_url`
+- `chunks`에 `dataset_name`, `document_name`, `snippet`, `score`, `source_ref`, `source_download_url`
 - `sources`에 dedupe된 다운로드 링크
+
+### 6-4-1. 같은 문서 안에서 추가 검색
+
+먼저 `search_dataset` 또는 `search_all` 응답에서 `sources[0].source_ref` 값을 복사합니다.
+
+```bash
+curl -sS -X POST http://127.0.0.1:8090/search_source \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "question": "이 문서 안에서 연차 사용 기한만 더 자세히 찾아줘",
+    "source_ref": "<search 결과의 source_ref>",
+    "top_k": 4
+  }' | jq
+```
+
+기대:
+
+- `selected_dataset`
+- `selected_document`
+- `chunks`와 `sources`가 모두 동일 문서만 가리킴
+- follow-up search가 `file_id`가 아니라 wrapper가 준 `source_ref`로만 동작
 
 ### 6-5. 전체 검색
 

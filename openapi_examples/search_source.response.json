@@ -1,8 +1,9 @@
 {
-  "query": "연차는 언제 소멸돼?",
+  "query": "이 문서 안에서 연차 사용 기한만 더 자세히 찾아줘",
   "selected_dataset": "hr_handbook",
+  "selected_document": "leave_policy.pdf",
   "found": true,
-  "result_count": 2,
+  "result_count": 1,
   "context_text": "[1] leave_policy.pdf\n연차는 발생일 기준 1년 내 사용해야 하며...",
   "chunks": [
     {

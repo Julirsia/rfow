@@ -19,6 +19,7 @@ class SourceItem(BaseModel):
     dataset_name: str
     document_name: str
     source_label: str
+    source_ref: str
     source_download_url: str
 
 
@@ -29,6 +30,7 @@ class EvidenceChunk(BaseModel):
     snippet: str
     score: float
     source_label: str
+    source_ref: str
     source_download_url: str
 
 
@@ -42,3 +44,11 @@ class SourceDownloadRef(BaseModel):
     filename: str
     exp: int
     download: Optional[str] = None
+
+
+class SourceSearchRef(BaseModel):
+    dataset_id: str
+    dataset_name: str
+    document_id: str
+    document_name: str
+    exp: int

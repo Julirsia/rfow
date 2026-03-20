@@ -18,6 +18,12 @@ class SearchAllRequest(FlatResponseModel):
     top_k: Optional[int] = Field(default=None, description="Optional number of evidence chunks to return.")
 
 
+class SearchSourceRequest(FlatResponseModel):
+    question: NonEmptyStr = Field(description="User question to search inside one previously returned source document.")
+    source_ref: NonEmptyStr = Field(description="Opaque source reference returned by this server. Never invent file IDs or document IDs.")
+    top_k: Optional[int] = Field(default=None, description="Optional number of evidence chunks to return.")
+
+
 class SearchDatasetResponse(FlatResponseModel):
     query: str
     selected_dataset: str
@@ -31,6 +37,17 @@ class SearchDatasetResponse(FlatResponseModel):
 class SearchAllResponse(FlatResponseModel):
     query: str
     matched_datasets: list[str]
+    found: bool
+    result_count: int
+    context_text: str
+    chunks: list[EvidenceChunk]
+    sources: list[SourceItem]
+
+
+class SearchSourceResponse(FlatResponseModel):
+    query: str
+    selected_dataset: str
+    selected_document: str
     found: bool
     result_count: int
     context_text: str

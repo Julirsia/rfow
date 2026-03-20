@@ -34,6 +34,7 @@ class DatasetDocumentItem(FlatResponseModel):
     document_name: str
     status: str
     source_label: str
+    source_ref: str
     source_download_url: str
 
 

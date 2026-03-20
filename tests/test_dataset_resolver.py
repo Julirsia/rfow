@@ -20,6 +20,7 @@ def test_documents_support_alias_resolution(client) -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["dataset_name"] == "hr_handbook"
+    assert body["documents"][0]["source_ref"]
     assert body["documents"][0]["source_download_url"].startswith("https://wrapper.example.com/_downloads/")
 
 

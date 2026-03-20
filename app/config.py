@@ -23,6 +23,7 @@ class Settings(BaseModel):
     context_max_chars: int = 1500
     download_token_ttl_seconds: int = 900
     download_token_secret: Optional[str] = None
+    source_ref_ttl_seconds: int = 86400
     cors_allowed_origins: list[str] = Field(default_factory=lambda: ["*"])
     log_level: str = "INFO"
     model_config = ConfigDict(str_strip_whitespace=True)
@@ -81,6 +82,7 @@ def get_settings() -> Settings:
         context_max_chars=int(_env("CONTEXT_MAX_CHARS", "1500")),
         download_token_ttl_seconds=int(_env("DOWNLOAD_TOKEN_TTL_SECONDS", "900")),
         download_token_secret=os.getenv("DOWNLOAD_TOKEN_SECRET"),
+        source_ref_ttl_seconds=int(_env("SOURCE_REF_TTL_SECONDS", "86400")),
         cors_allowed_origins=_split_csv(os.getenv("CORS_ALLOWED_ORIGINS")),
         log_level=_env("LOG_LEVEL", "INFO"),
     )
@@ -109,6 +111,7 @@ def settings_for_tests(**overrides: Any) -> Settings:
         "context_max_chars": 1500,
         "download_token_ttl_seconds": 900,
         "download_token_secret": "test-secret",
+        "source_ref_ttl_seconds": 86400,
         "cors_allowed_origins": ["*"],
         "log_level": "INFO",
     }

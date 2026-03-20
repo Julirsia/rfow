@@ -8,6 +8,7 @@ Open WebUI에서 소형 모델이 안정적으로 사용할 수 있도록 RAGFlo
 - 모델에는 `dataset_id`를 노출하지 않습니다.
 - retrieval raw 파라미터는 숨기고 `question`, `dataset_name`, `top_k`만 받습니다.
 - 응답에는 항상 근거 chunk와 원문 다운로드 링크를 포함합니다.
+- 후속 문서 검색은 `source_ref` 기반 `search_source`로만 받습니다.
 - write/delete/upload/parse control API는 노출하지 않습니다.
 
 ## 공개 엔드포인트
@@ -16,6 +17,7 @@ Open WebUI에서 소형 모델이 안정적으로 사용할 수 있도록 RAGFlo
 - `GET /datasets`
 - `GET /datasets/{dataset_name}/documents`
 - `POST /search_dataset`
+- `POST /search_source`
 - `POST /search_all`
 
 비공개 다운로드 프록시:
@@ -54,6 +56,12 @@ datasets:
     aliases: ["hr", "handbook", "인사규정"]
     enabled: true
 ```
+
+## 문서 내부 후속 검색
+
+- `search_dataset`와 `search_all` 응답의 `chunks[]`, `sources[]`에는 `source_ref`가 포함됩니다.
+- `source_ref`는 opaque token입니다. 모델은 `file_id`나 `document_id`를 추측하지 말고, 이 값을 그대로 `search_source`에 다시 넣어야 합니다.
+- `search_source`는 해당 문서 하나 안에서만 retrieval 하도록 범위를 제한합니다.
 
 ## Open WebUI 연결
 

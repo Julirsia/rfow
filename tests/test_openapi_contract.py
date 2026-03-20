@@ -5,6 +5,7 @@ def test_public_openapi_paths_are_small_and_read_only(client) -> None:
         "/datasets",
         "/datasets/{dataset_name}/documents",
         "/search_dataset",
+        "/search_source",
         "/search_all",
     }
 
@@ -24,5 +25,6 @@ def test_search_dataset_schema_does_not_expose_dataset_id(client) -> None:
 def test_operation_ids_and_descriptions_are_present(client) -> None:
     paths = client.app.openapi()["paths"]
     assert paths["/search_dataset"]["post"]["operationId"] == "searchDataset"
+    assert paths["/search_source"]["post"]["operationId"] == "searchSource"
     assert "Prefer searchDataset whenever possible" in paths["/search_all"]["post"]["description"]
     assert "Admin/debug only" in paths["/health"]["get"]["description"]

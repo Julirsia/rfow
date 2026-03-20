@@ -4,10 +4,10 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Request
 
-from app.deps import get_dataset_resolver, get_download_token_signer, get_ragflow_client
+from app.deps import get_dataset_resolver, get_download_token_signer, get_ragflow_client, get_source_ref_signer
 from app.models.datasets import DatasetDocumentItem, DatasetDocumentsResponse, DatasetsResponse
 from app.services.dataset_resolver import DatasetResolver
-from app.services.download_tokens import DownloadTokenSigner
+from app.services.download_tokens import DownloadTokenSigner, SourceRefSigner
 from app.services.ragflow_client import RagflowClient
 
 router = APIRouter(tags=["datasets"])
@@ -30,6 +30,22 @@ def _download_url(
 ) -> str:
     token = signer.sign(dataset_id=dataset_id, document_id=document_id, filename=filename)
     return f"{_base_url(request, public_base_url)}/_downloads/{token}"
+
+
+def _source_ref(
+    *,
+    signer: SourceRefSigner,
+    dataset_id: str,
+    dataset_name: str,
+    document_id: str,
+    document_name: str,
+) -> str:
+    return signer.sign(
+        dataset_id=dataset_id,
+        dataset_name=dataset_name,
+        document_id=document_id,
+        document_name=document_name,
+    )
 
 
 @router.get(
@@ -58,6 +74,7 @@ async def list_dataset_documents(
     dataset_resolver: DatasetResolver = Depends(get_dataset_resolver),
     ragflow_client: RagflowClient = Depends(get_ragflow_client),
     signer: DownloadTokenSigner = Depends(get_download_token_signer),
+    source_ref_signer: SourceRefSigner = Depends(get_source_ref_signer),
 ) -> DatasetDocumentsResponse:
     resolved_dataset = await dataset_resolver.resolve(dataset_name)
     documents, total = await ragflow_client.list_documents(resolved_dataset.dataset_id, page_size=limit)
@@ -76,6 +93,13 @@ async def list_dataset_documents(
                 document_name=document_name,
                 status=str(item.get("run") or item.get("status") or "unknown"),
                 source_label=f"{resolved_dataset.public_name} / {document_name}",
+                source_ref=_source_ref(
+                    signer=source_ref_signer,
+                    dataset_id=resolved_dataset.dataset_id,
+                    dataset_name=resolved_dataset.public_name,
+                    document_id=document_id,
+                    document_name=document_name,
+                ),
                 source_download_url=_download_url(
                     request=request,
                     signer=signer,

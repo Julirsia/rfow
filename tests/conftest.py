@@ -49,11 +49,12 @@ from app.deps import (
     get_dataset_resolver,
     get_download_token_signer,
     get_ragflow_client,
+    get_source_ref_signer,
 )
 from app.main import app
 from app.services.dataset_catalog import DatasetCatalog
 from app.services.dataset_resolver import DatasetResolver
-from app.services.download_tokens import DownloadTokenSigner
+from app.services.download_tokens import DownloadTokenSigner, SourceRefSigner
 
 
 class FakeRagflowClient:
@@ -100,6 +101,7 @@ class FakeRagflowClient:
             ("ds-fin", "doc-expense"): (b"expense file", {"content-type": "application/pdf", "content-disposition": 'attachment; filename="expense_policy.pdf"'}),
         }
         self.health_ok = True
+        self.retrieve_calls: list[dict[str, Any]] = []
 
     async def close(self) -> None:
         return None
@@ -117,6 +119,7 @@ class FakeRagflowClient:
         return docs, len(docs)
 
     async def retrieve(self, payload: dict[str, Any]):
+        self.retrieve_calls.append(dict(payload))
         dataset_ids = payload.get("dataset_ids", [])
         question = str(payload.get("question") or "")
         if dataset_ids == ["ds-fin"] or "출장비" in question:
@@ -150,11 +153,13 @@ def client(fake_ragflow_client: FakeRagflowClient) -> TestClient:
     get_dataset_catalog.cache_clear()
     get_dataset_resolver.cache_clear()
     get_download_token_signer.cache_clear()
+    get_source_ref_signer.cache_clear()
     get_ragflow_client.cache_clear()
 
     settings = settings_for_tests(dataset_config_path=str(DATASET_CONFIG_PATH))
     catalog = DatasetCatalog.from_path(DATASET_CONFIG_PATH)
     signer = DownloadTokenSigner(secret=settings.download_token_secret or settings.ragflow_api_key, ttl_seconds=settings.download_token_ttl_seconds)
+    source_ref_signer = SourceRefSigner(secret=settings.download_token_secret or settings.ragflow_api_key, ttl_seconds=settings.source_ref_ttl_seconds)
     resolver = DatasetResolver(settings=settings, catalog=catalog, ragflow_client=fake_ragflow_client)
 
     app.dependency_overrides[get_app_settings] = lambda: settings
@@ -162,6 +167,7 @@ def client(fake_ragflow_client: FakeRagflowClient) -> TestClient:
     app.dependency_overrides[get_dataset_catalog] = lambda: catalog
     app.dependency_overrides[get_dataset_resolver] = lambda: resolver
     app.dependency_overrides[get_download_token_signer] = lambda: signer
+    app.dependency_overrides[get_source_ref_signer] = lambda: source_ref_signer
 
     with TestClient(app) as test_client:
         yield test_client

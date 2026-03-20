@@ -5,8 +5,8 @@ import re
 from typing import Any, Callable
 
 from app.config import Settings
-from app.models.common import EvidenceChunk, SourceItem
-from app.models.search import SearchAllResponse, SearchDatasetResponse
+from app.models.common import EvidenceChunk, SourceItem, SourceSearchRef
+from app.models.search import SearchAllResponse, SearchDatasetResponse, SearchSourceResponse
 from app.services.dataset_resolver import ResolvedDataset
 
 
@@ -109,12 +109,14 @@ def normalize_search_dataset_response(
     retrieval_payload: dict[str, Any],
     settings: Settings,
     download_url_builder: Callable[[str, str, str], str],
+    source_ref_builder: Callable[[str, str, str, str], str],
 ) -> SearchDatasetResponse:
     normalized = _normalize_common(
         retrieval_payload=retrieval_payload,
         settings=settings,
         dataset_id_to_name={resolved_dataset.dataset_id: resolved_dataset.public_name},
         download_url_builder=download_url_builder,
+        source_ref_builder=source_ref_builder,
     )
     return SearchDatasetResponse(
         query=query,
@@ -134,6 +136,7 @@ def normalize_search_all_response(
     retrieval_payload: dict[str, Any],
     settings: Settings,
     download_url_builder: Callable[[str, str, str], str],
+    source_ref_builder: Callable[[str, str, str, str], str],
 ) -> SearchAllResponse:
     dataset_id_to_name = {item.dataset_id: item.public_name for item in resolved_datasets}
     normalized = _normalize_common(
@@ -141,11 +144,41 @@ def normalize_search_all_response(
         settings=settings,
         dataset_id_to_name=dataset_id_to_name,
         download_url_builder=download_url_builder,
+        source_ref_builder=source_ref_builder,
     )
     matched_datasets = sorted({chunk.dataset_name for chunk in normalized["chunks"]})
     return SearchAllResponse(
         query=query,
         matched_datasets=matched_datasets,
+        found=bool(normalized["chunks"]),
+        result_count=len(normalized["chunks"]),
+        context_text=normalized["context_text"],
+        chunks=normalized["chunks"],
+        sources=normalized["sources"],
+    )
+
+
+def normalize_search_source_response(
+    *,
+    query: str,
+    source_ref: SourceSearchRef,
+    retrieval_payload: dict[str, Any],
+    settings: Settings,
+    download_url_builder: Callable[[str, str, str], str],
+    source_ref_builder: Callable[[str, str, str, str], str],
+) -> SearchSourceResponse:
+    normalized = _normalize_common(
+        retrieval_payload=retrieval_payload,
+        settings=settings,
+        dataset_id_to_name={source_ref.dataset_id: source_ref.dataset_name},
+        download_url_builder=download_url_builder,
+        source_ref_builder=source_ref_builder,
+        document_scope=(source_ref.dataset_id, source_ref.document_id),
+    )
+    return SearchSourceResponse(
+        query=query,
+        selected_dataset=source_ref.dataset_name,
+        selected_document=source_ref.document_name,
         found=bool(normalized["chunks"]),
         result_count=len(normalized["chunks"]),
         context_text=normalized["context_text"],
@@ -160,6 +193,8 @@ def _normalize_common(
     settings: Settings,
     dataset_id_to_name: dict[str, str],
     download_url_builder: Callable[[str, str, str], str],
+    source_ref_builder: Callable[[str, str, str, str], str],
+    document_scope: tuple[str, str] | None = None,
 ) -> dict[str, Any]:
     raw_chunks = _extract_chunks(retrieval_payload)
     doc_name_map = _doc_name_map(retrieval_payload)
@@ -170,6 +205,8 @@ def _normalize_common(
         if not document_id:
             continue
         dataset_id = _chunk_dataset_id(chunk)
+        if document_scope and (dataset_id, document_id) != document_scope:
+            continue
         dataset_name = dataset_id_to_name.get(dataset_id)
         if not dataset_name:
             continue
@@ -179,6 +216,7 @@ def _normalize_common(
             continue
         score = _chunk_score(chunk)
         source_url = download_url_builder(dataset_id, document_id, document_name)
+        source_ref = source_ref_builder(dataset_id, dataset_name, document_id, document_name)
         normalized_key = (dataset_name, document_name.lower(), snippet.lower())
         evidence = EvidenceChunk(
             rank=0,
@@ -187,6 +225,7 @@ def _normalize_common(
             snippet=snippet,
             score=score,
             source_label=_source_label(dataset_name, document_name),
+            source_ref=source_ref,
             source_download_url=source_url,
         )
         existing = deduped.get(normalized_key)
@@ -211,6 +250,7 @@ def _normalize_common(
                 dataset_name=chunk.dataset_name,
                 document_name=chunk.document_name,
                 source_label=chunk.source_label,
+                source_ref=chunk.source_ref,
                 source_download_url=chunk.source_download_url,
             )
         )
